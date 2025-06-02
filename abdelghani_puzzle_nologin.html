@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة تركيب الصورة - عبد الغني</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 0; padding: 0; background: #f0f0f0; }
+    h1 { padding: 20px; }
+    #puzzle { width: 300px; height: 300px; margin: auto; display: flex; flex-wrap: wrap; border: 2px solid #333; }
+    .tile {
+      width: 98px; height: 98px; margin: 1px;
+      background-size: 300px 300px;
+      border: 1px solid #999;
+      cursor: pointer;
+    }
+    .empty { background: none; border: none; }
+  </style>
+</head>
+<body>
+  <h1>لعبة تركيب الصورة - عبد الغني</h1>
+  <div id="puzzle"></div>
+  <p>رتّب الصورة بالنقر على المربعات لتحريكها.</p>
+
+  <script>
+    const puzzle = document.getElementById("puzzle");
+    let tiles = [];
+
+    function createPuzzle() {
+      tiles = [];
+      puzzle.innerHTML = "";
+      let positions = [...Array(9).keys()];
+      shuffle(positions);
+
+      for (let i = 0; i < 9; i++) {
+        const div = document.createElement("div");
+        if (positions[i] === 8) {
+          div.className = "tile empty";
+        } else {
+          div.className = "tile";
+          div.style.backgroundImage = "url('https://i.imgur.com/L8p0Q3p.jpg')";
+          const x = (positions[i] % 3) * -100;
+          const y = Math.floor(positions[i] / 3) * -100;
+          div.style.backgroundPosition = `${x}px ${y}px`;
+        }
+        div.dataset.index = positions[i];
+        puzzle.appendChild(div);
+        tiles.push(div);
+      }
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    puzzle.addEventListener("click", (e) => {
+      const idx = [...puzzle.children].indexOf(e.target);
+      if (e.target.classList.contains("empty")) return;
+
+      const emptyIdx = tiles.findIndex(t => t.classList.contains("empty"));
+      const validMoves = [emptyIdx - 1, emptyIdx + 1, emptyIdx - 3, emptyIdx + 3];
+      if (validMoves.includes(idx)) {
+        const temp = tiles[emptyIdx].className;
+        tiles[emptyIdx].className = tiles[idx].className;
+        tiles[emptyIdx].style.backgroundImage = tiles[idx].style.backgroundImage;
+        tiles[emptyIdx].style.backgroundPosition = tiles[idx].style.backgroundPosition;
+
+        tiles[idx].className = "tile empty";
+        tiles[idx].style.backgroundImage = "";
+        tiles[idx].style.backgroundPosition = "";
+      }
+    });
+
+    createPuzzle();
+  </script>
+</body>
+</html>
